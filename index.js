@@ -1,10 +1,13 @@
 import express from "express";
 import router from './routes/api.js';
+import bodyParser from "body-parser";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
 app.use('', router)
 
 
@@ -20,8 +23,8 @@ app.get("/", (req, res) => {
 
 // error handler (last middleware)
 app.use((error, req, res, next) => {
-    console.error(err.stack); // error for dev 
-    res.status(err.status || 500).json({
-        error: err.message || "Internal Server Error",
+    console.error(error.stack); // error for dev 
+    res.status(error.status || 500).json({
+        error: error.message || "Internal Server Error",
     });
 });
