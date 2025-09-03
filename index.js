@@ -19,8 +19,8 @@ app.get("/", (req, res) => {
 
 
 // error handler (last middleware)
-app.use((err, req, res, next) => {
-    console.error(err.stack); // detailed error for dev logs
+app.use((error, req, res, next) => {
+    console.error(err.stack); // error for dev 
     res.status(err.status || 500).json({
         error: err.message || "Internal Server Error",
     });
