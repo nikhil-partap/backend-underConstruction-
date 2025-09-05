@@ -6,25 +6,53 @@ const router = express.Router();
 // get a list of ninjas from the database 
 router.get('/ninjas', async (req, res, next) => {
     try {
-        const { lng, lat } = req.query;
+        const { lng, lat, maxDistance = 1000000000, unit = "m" } = req.query;
 
         if (!lng || !lat) {
             return res.status(400).json({ error: "please provide lng and lat " })
         }
 
-        const ninjas = await Ninja.find({
-            geometry: {
-                $near: {
-                    $geometry: {
-                        type: "point",
-                        coordinates: [parseFloat(lng), parseFloat(lat)],     // the lng and lat you recieve are in string form so we have  to convert them to int 
+        const parsedLng = parseFloat(lng);
+        const parsedLat = parseFloat(lat)
+        const parsedMax = parseInt(maxDistance, 10)
+
+        if (Number.isNaN(parsedLng) || Number.isNaN(parsedLat)) {
+            return res.status(400).json({ error: "lng and lat must be valids nos" })
+        }
+
+        const distanceMultiplier = unit === "km" ? 0.001 : 1;
+
+        const pipeline = [
+            {
+                $geoNear: {
+                    near: {
+                        type: "Point",
+                        coordinates: [parsedLng, parsedLat],     // the lng and lat you recieve are in string form so we have  to convert them to int 
                     },
-                    $maxDistance: 100000,   // 100 km radius 
+                    distanceField: "distance",   // 100 km radius 
+                    spherical: true,
+                    maxDistance: parsedMax, distanceMultiplier,
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    rank: 1,
+                    availability: 1,
+                    geometry: 1,
+                    distance: { $round: ["$distance", 2] },
                 }
             }
-        })
+        ]
 
-        res.status(200).json(ninjas);
+        const results = await Ninja.aggregate(pipeline);
+
+        res.status(200).json({
+            success: true,
+            count: results.length,
+            unit: unit === "km" ? "km" : "m",
+            data: results,
+        });
     } catch (error) {
         next(error);
     }

@@ -3,11 +3,11 @@ import mongoose, { Schema } from "mongoose";
 const GeoSchema = new Schema({
     type: {
         type: String,
-        default: "point"   // the ninjas are marked as a point on the map 
+        default: "Point"   // the ninjas are marked as a point on the map 
     },
     coordinates: {
         type: [Number],
-        index: "2dsphere"   // 2d distance on a 3d sphere(earth) 
+        // index: "2dsphere"     not working assigning the index on the whole geometry field not just coordinates
     }
 }, { _id: false },  // i dont want a seprate id for the subdoc
 )
@@ -28,9 +28,10 @@ const NinjaSchema = new Schema({
     },
     geometry: GeoSchema,
 },
-    {
-        timestamps: true
-    }
+    { timestamps: true }
 );
+
+
+// NinjaSchema.index({ geometry: "2dsphere" })     // assigning the index to whole geometry 
 
 export default mongoose.model("Ninja", NinjaSchema, "ninja")

@@ -3,11 +3,16 @@ import router from './routes/api.js';
 import bodyParser from "body-parser";
 import mongoose from 'mongoose'
 import connectDB from "./database/db.js"
+import Ninja from "./models/ninja.js"
+
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-connectDB();
+connectDB().then(async () => {
+    await Ninja.init();      // forcing the index recreation because NinjaSchema.index({ geometry: "2dsphere" })   not working 
+    console.log("Indexes ensured")
+})
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
