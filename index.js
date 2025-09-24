@@ -7,8 +7,7 @@ import Ninja from "./models/ninja.js";
 import cors from "cors";
 
 const app = express();
-app.use(cors());
-app.options("*", cors()); // allow preflight for all routes
+
 const PORT = process.env.PORT || 4000;
 
 connectDB().then(async () => {

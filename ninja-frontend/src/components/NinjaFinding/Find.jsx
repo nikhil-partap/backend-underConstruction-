@@ -1,122 +1,7 @@
 import React, {useState} from "react";
-import {useMediaQuery} from "./components/hooks/useMediaQuery";
 import {Link, NavLink} from "react-router-dom";
 
-// Separate component for displaying ninja results
-const NinjaResults = ({ninjas, unit}) => {
-  const getRankEmoji = (rank) => {
-    const rankMap = {
-      "black belt": "🥋",
-      "red belt": "RED BELT",
-      "blue belt": "BLUE BELT",
-      "yellow belt": "YELLOW BELT",
-      "green belt": "GREEN BELT",
-      "pink belt": "PINK BELT",
-      "white belt": "WHITE BELT",
-      "brown belt": "BROWN BELT",
-      "purple belt": "PURPLE BELT",
-      "orange belt": "ORANGE BELT",
-    };
-    return rankMap[rank?.toLowerCase()] || "🥋";
-  };
-
-  const formatDistance = (distance, unit) => {
-    if (unit === "km") {
-      return `${(distance / 1000).toFixed(2)} km`;
-    }
-    if (distance >= 1000) {
-      return `${(distance / 1000).toFixed(2)} km`;
-    }
-    return `${Math.round(distance)} m`;
-  };
-
-  return (
-    <div className="mb-4 space-y-3 animate-fadeIn">
-      <div className="text-center mb-4">
-        <div className="mb-2 text-3xl">🎯</div>
-        <h3 className="text-lg font-bold text-green-200">
-          Top {ninjas.length} Ninjas Found!
-        </h3>
-      </div>
-
-      {ninjas.map((ninja, index) => (
-        <div
-          key={ninja._id}
-          className={`relative rounded-2xl border p-4 backdrop-blur-sm transition-all duration-300 hover:scale-105 ${
-            index === 0
-              ? "bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-400/50"
-              : index === 1
-              ? "bg-gradient-to-r from-gray-400/20 to-slate-400/20 border-gray-400/50"
-              : "bg-gradient-to-r from-orange-600/20 to-red-600/20 border-orange-400/50"
-          }`}
-        >
-          {/* Rank badge */}
-          <div className="absolute -top-2 -right-2">
-            <div
-              className={`rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold ${
-                index === 0
-                  ? "bg-gradient-to-r from-yellow-400 to-amber-500 text-black"
-                  : index === 1
-                  ? "bg-gradient-to-r from-gray-300 to-slate-400 text-black"
-                  : "bg-gradient-to-r from-orange-400 to-red-500 text-white"
-              }`}
-            >
-              {index + 1}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <div className="flex items-center mb-2">
-                <span className="text-2xl mr-3">🥷</span>
-                <div>
-                  <h4 className="font-bold text-white text-lg">{ninja.name}</h4>
-                  <div className="flex items-center text-sm text-purple-200">
-                    <span className="mr-1">{getRankEmoji(ninja.rank)}</span>
-                    <span className="capitalize">{ninja.rank}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center text-purple-200">
-                  <span className="mr-1">📏</span>
-                  <span>{formatDistance(ninja.distance, unit)} away</span>
-                </div>
-
-                <div className="flex items-center">
-                  <span className="mr-1">
-                    {ninja.availability ? "✅" : "❌"}
-                  </span>
-                  <span
-                    className={
-                      ninja.availability ? "text-green-300" : "text-red-300"
-                    }
-                  >
-                    {ninja.availability ? "Available" : "Busy"}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Coordinates info */}
-          <div className="mt-3 pt-3 border-t border-white/20">
-            <div className="text-xs text-purple-300 flex items-center">
-              <span className="mr-1">📍</span>
-              <span>
-                {ninja.geometry.coordinates[1].toFixed(4)},{" "}
-                {ninja.geometry.coordinates[0].toFixed(4)}
-              </span>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-export default function ClosestNinjaBox() {
+export default function DefaultFirstpage() {
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
   const [loading, setLoading] = useState(false);
@@ -167,14 +52,9 @@ export default function ClosestNinjaBox() {
       }
 
       const data = await res.json();
-
-      // Get top 3 ninjas from the data
-      const topNinjas = data.data?.slice(0, 3) || [];
-
       setResult({
-        ninjas: topNinjas,
+        item: data.data?.[0] ?? null,
         unit: data.unit ?? "m",
-        count: data.count || 0,
       });
     } catch (e) {
       setError(e.message || "Something went wrong.");
@@ -184,10 +64,9 @@ export default function ClosestNinjaBox() {
   };
 
   const canSearch = lat !== "" && lng !== "";
-  const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-br from-green-900 via-blue-900 to-gray-600">
+    <div className="relative min-h-screen w-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-32 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
@@ -202,7 +81,7 @@ export default function ClosestNinjaBox() {
           <div className="relative rounded-3xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-xl">
             {/* Ninja emoji animation */}
             <div className="mb-6 text-center">
-              <div className="inline-block text-6xl animate">🥷</div>
+              <div className="inline-block text-6xl animate-bounce ">🥷</div>
             </div>
 
             {/* Header */}
@@ -277,7 +156,6 @@ export default function ClosestNinjaBox() {
                   <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-400 to-indigo-400 opacity-0 transition-opacity duration-300 group-hover:opacity-20"></div>
                 )}
               </button>
-
               <button
                 onClick={handleGetCoords}
                 disabled={locationLoading}
@@ -294,6 +172,7 @@ export default function ClosestNinjaBox() {
                   )}
                 </span>
               </button>
+              <NavLink to="/result"> to the NinjaResults</NavLink>
             </div>
 
             {/* Error display */}
@@ -306,12 +185,43 @@ export default function ClosestNinjaBox() {
               </div>
             )}
 
-            {/* Results display */}
-            {result && result.ninjas && result.ninjas.length > 0 && (
-              <NinjaResults ninjas={result.ninjas} unit={result.unit} />
+            {/* Result display */}
+            {result && result.item && (
+              <div className="mb-4 rounded-2xl bg-green-500/20 border border-green-400/50 p-6 backdrop-blur-sm animate-fadeIn">
+                <div className="text-center">
+                  <div className="mb-3 text-3xl">🎯</div>
+                  <h3 className="mb-2 text-lg font-bold text-green-200">
+                    Ninja Found!
+                  </h3>
+                  <div className="space-y-2 text-sm text-green-100">
+                    <div className="flex items-center justify-center">
+                      <span className="mr-2">👤</span>
+                      <span className="font-semibold">{result.item.name}</span>
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <span className="mr-2">📏</span>
+                      <span>
+                        {result.item.distance} {result.unit} away
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <span className="mr-2">🏆</span>
+                      <span>{result.item.rank}</span>
+                    </div>
+                    <div className="flex items-center justify-center">
+                      <span className="mr-2">
+                        {result.item.availability ? "✅" : "❌"}
+                      </span>
+                      <span>
+                        {result.item.availability ? "Available" : "Busy"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
 
-            {result && (!result.ninjas || result.ninjas.length === 0) && (
+            {result && !result.item && (
               <div className="mb-4 rounded-2xl bg-yellow-500/20 border border-yellow-400/50 p-4 backdrop-blur-sm animate-fadeIn">
                 <p className="text-center text-sm text-yellow-200 flex items-center justify-center">
                   <span className="mr-2">🤷‍♂️</span>
@@ -332,38 +242,6 @@ export default function ClosestNinjaBox() {
           {/* Decorative elements */}
           <div className="mt-8 text-center">
             <div className="inline-flex space-x-2 text-2xl animate-pulse"></div>
-          </div>
-          <div className="rounded-3xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-xl">
-            {/* Header */}
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Are you a ninja?
-              </h2>
-              <p className="text-black mb-3">Choose your path to get started</p>
-            </div>
-
-            {/* Buttons */}
-            <div
-              className={`flex flex-col sm:flex-row gap-4 items-center ${
-                isMobile ? "ml-1" : "ml-9"
-              }`}
-            >
-              <NavLink
-                to="/login"
-                className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium px-8 py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:ring-4 focus:ring-blue-300 focus:outline-none"
-              >
-                Login
-              </NavLink>
-
-              <span className="text-black font-medium px-4">or</span>
-
-              <NavLink
-                to="/signup"
-                className="w-full sm:w-auto bg-white hover:bg-gray-50 border-2 border-blue-500 text-blue-500 hover:text-blue-600 font-medium px-8 py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg focus:ring-4 focus:ring-blue-300 focus:outline-none"
-              >
-                Sign Up
-              </NavLink>
-            </div>
           </div>
         </div>
       </div>

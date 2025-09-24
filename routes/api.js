@@ -6,7 +6,7 @@ const router = express.Router();
 // get a list of ninjas from the database
 router.get("/ninjas", async (req, res, next) => {
   try {
-    const {lng, lat, maxDistance = 1000000000, unit = "m"} = req.query;
+    const {lng, lat, maxDistance = 1000000000, unit = "km"} = req.query;
 
     if (!lng || !lat) {
       return res.status(400).json({error: "please provide lng and lat "});
@@ -31,7 +31,8 @@ router.get("/ninjas", async (req, res, next) => {
           },
           distanceField: "distance", // 100 km radius
           spherical: true,
-          maxDistance: parsedMax * distanceMultiplier,
+          maxDistance: parsedMax,
+          distanceMultiplier,
         },
       },
       {
