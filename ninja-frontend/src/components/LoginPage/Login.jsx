@@ -302,8 +302,7 @@ export default function Login() {
 
           {/* Decorative elements */}
           <div className="mt-8 text-center">
-            <div className="inline-flex space-x-2 text-2xl animate-pulse">
-            </div>
+            <div className="inline-flex space-x-2 text-2xl animate-pulse"></div>
           </div>
         </div>
       </div>
