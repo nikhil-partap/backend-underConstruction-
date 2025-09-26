@@ -1,6 +1,7 @@
 import express from "express";
 import Ninja from "../models/ninja.js";
 import mongoose from "mongoose";
+import auth from "../MiddleWare/authMiddleware.js";
 const router = express.Router();
 
 // get a list of ninjas from the database
@@ -59,8 +60,8 @@ router.get("/ninjas", async (req, res, next) => {
   }
 });
 
-// add a new ninja to db
-router.post("/ninjas", async (req, res, next) => {
+// add a new ninja to db (protected)
+router.post("/ninjas", auth, async (req, res, next) => {
   try {
     const ninja = await Ninja.create(req.body);
     res.status(201).json(ninja);
@@ -76,8 +77,8 @@ router.post("/ninjas", async (req, res, next) => {
   }
 });
 
-// update a ninja in the db
-router.put("/ninjas/:id", async (req, res, next) => {
+// update a ninja in the db (protected)
+router.put("/ninjas/:id", auth, async (req, res, next) => {
   try {
     const ninja = await Ninja.findByIdAndUpdate(
       req.params.id, // it takes the id from the URL of the ninja that we want to delete
@@ -96,8 +97,8 @@ router.put("/ninjas/:id", async (req, res, next) => {
   }
 });
 
-// delete a ninja from the db
-router.delete("/ninjas/:id", async (req, res, next) => {
+// delete a ninja from the db (protected)
+router.delete("/ninjas/:id", auth, async (req, res, next) => {
   try {
     const ninja = await Ninja.findByIdAndDelete(req.params.id); // to delete one by id
     // const ninjas = await Ninja.findOneAndDelete()  // to delete one by filter
@@ -112,14 +113,28 @@ router.delete("/ninjas/:id", async (req, res, next) => {
   }
 });
 
-// router.delete('/ninjas', async (req, res, next) => {
-//     try {
-//         // below is to identify what type of request user made
-//         console.log("Delete ALL /ninja called")
-//         res.status(200).json({ type: 'DELETE', action: "delete all of /ninjas", data: ["user123"] })     // i have used the 200 html code insted of 204 because i cant recieve responce/data with the 204 code it is only for success not to return after success
-//     } catch (error) {
-//         next(error)
-//     }
-// })
+
+// only use if you want to delete all the data of the database 
+// router.delete("/ninjas", async (req, res, next) => {
+//   try {
+//     // if (req.query.confirm !== "true") {
+//     //   return res.status(400).json({
+//     //     error: "You must pass ?confirm=true to delete all ninjas"
+//     //   });
+//     // }
+
+//     // actually delete
+//     const result = await Ninja.deleteMany({});
+
+//     // return number deleted (200 OK). You can also use 204 No Content but then no body allowed.
+//     res.status(200).json({
+//       success: true,
+//       deletedCount: result.deletedCount
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// });
+
 
 export default router;

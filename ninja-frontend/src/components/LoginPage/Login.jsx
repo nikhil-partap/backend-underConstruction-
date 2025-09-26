@@ -24,8 +24,8 @@ export default function Login() {
     setError("");
 
     try {
-      //  login API endpoint
-      const response = await fetch("/api/auth/login", {
+      //  login API endpoint (proxied by Vite)
+      const response = await fetch("/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +34,8 @@ export default function Login() {
       });
 
       if (!response.ok) {
-        throw new Error("Invalid credentials");
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.message || "Invalid credentials");
       }
 
       const data = await response.json();
@@ -87,7 +88,7 @@ export default function Login() {
 
             {/* Ninja emoji animation */}
             <div className="mb-6 text-center">
-              <div className="inline-block text-6xl animate-bounce">🥷</div>
+              <div className="inline-block text-6xl ">🥷</div>
             </div>
 
             {/* Header */}
@@ -216,7 +217,7 @@ export default function Login() {
                       Entering the dojo...
                     </>
                   ) : (
-                    <>🚀 Enter the Dojo</>
+                    <>Enter the Dojo</>
                   )}
                 </span>
                 {!loading && (

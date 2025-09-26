@@ -11,7 +11,9 @@ import DefaultFirstPage from "./components/NinjaFinding/Find.jsx";
 import App from './App.jsx'
 import NinjaResults from "./components/NinjaResults.jsx";
 import Login from "./components/LoginPage/Login.jsx";
-
+import Signup from "./components/signup/SignUp.jsx";
+import Dashboard from "./components/Dashboard.jsx";
+import ResultsPage from "./components/ResultsPage.jsx";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -23,8 +25,10 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>
       <Route index element={<App /> } />
-      <Route path="result" element={<NinjaResults />} />
       <Route path="login" element={<Login />} />
+      <Route path="signup" element={<Signup />  } />
+      <Route path="dashboard" element={<Dashboard />} />
+      <Route path="result" element={<ResultsPage />} />
     </Route>
   )
 );
