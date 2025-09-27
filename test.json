@@ -1,0 +1,16 @@
+{
+  "message": "Bad Request",
+  "error": [
+    {
+      "message": "\"name\" length must be at least 3 characters long",
+      "path": ["name"],
+      "type": "string.min",
+      "context": {
+        "limit": 3,
+        "value": "hi",
+        "label": "name",
+        "key": "name"
+      }
+    }
+  ]
+}

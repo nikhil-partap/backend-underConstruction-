@@ -19,6 +19,7 @@ const signup = async (req, res, next) => {
 
     // bcrypting the user pass
     const hashedPassword = await bcrypt.hash(password, 10);
+
     // if the user does not exist add it to the database
     const newUser = new UserModel({name, email, password: hashedPassword});
     await newUser.save();

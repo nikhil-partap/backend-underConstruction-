@@ -1,14 +1,17 @@
 // src/main.jsx
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import {StrictMode} from "react";
+import {createRoot} from "react-dom/client";
 import "./index.css";
+import "react-toastify/dist/ReactToastify.css";
+import React from "react";
+import ReactDOM from "react-dom/client";
 
 // Router layout
 import RootLayout from "./router/Router.jsx";
 
 // Pages / route components
 import DefaultFirstPage from "./components/NinjaFinding/Find.jsx";
-import App from './App.jsx'
+import App from "./App.jsx";
 import NinjaResults from "./components/NinjaResults.jsx";
 import Login from "./components/LoginPage/Login.jsx";
 import Signup from "./components/signup/SignUp.jsx";
@@ -24,9 +27,9 @@ import {
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>
-      <Route index element={<App /> } />
+      <Route index element={<App />} />
       <Route path="login" element={<Login />} />
-      <Route path="signup" element={<Signup />  } />
+      <Route path="signup" element={<Signup />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="result" element={<ResultsPage />} />
     </Route>

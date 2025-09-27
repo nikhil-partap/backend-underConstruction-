@@ -21,15 +21,15 @@ const NinjaSchema = new Schema(
       required: [true, "Name field is required"],
       trim: true,
     },
-    email:{
-      type: String,
-      required: true,
-      unique:true,
-    },
-    password: {
-      type: String,
-      required:true,
-    },
+    // email:{
+    //   type: String,
+    //   required: true,
+    //   unique:true,
+    // },
+    // password: {
+    //   type: String,
+    //   required:true,
+    // },
     rank: {
       type: String,
     },
@@ -42,6 +42,6 @@ const NinjaSchema = new Schema(
   {timestamps: true}
 );
 
-NinjaSchema.index({ geometry: "2dsphere" })     // assigning the index to whole geometry
+NinjaSchema.index({geometry: "2dsphere"}); // assigning the index to whole geometry
 
 export default mongoose.model("Ninja", NinjaSchema, "ninja");
