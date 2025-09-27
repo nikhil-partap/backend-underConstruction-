@@ -5,23 +5,32 @@ import jwt from "jsonwebtoken";
 
 const loginController = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const {email, password} = req.body;
+    const user = await User.findOne({email});
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials", success: false });
+      return res.status(403).json({
+        message: "Invalid email or the account doesnot exist",
+        success: false,
+      });
     }
 
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) {
-      return res.status(401).json({ message: "Invalid credentials", success: false });
+    const passwordCompare = await bcrypt.compare(password, user.password);
+    if (!passwordCompare) {
+      return res
+        .status(401)
+        .json({message: "Invalid Passoword", success: false});
     }
 
     // sign a JWT (example). Put a secret in process.env.JWT_SECRET
-    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET || "devsecret", {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      {id: user._id, email: user.email},
+      process.env.JWT_SECRET || "devsecret",
+      {
+        expiresIn: "7d",
+      }
+    );
 
-    return res.status(200).json({ success: true, token });
+    return res.status(200).json({name: user.name, success: true, token});
   } catch (err) {
     next(err);
   }

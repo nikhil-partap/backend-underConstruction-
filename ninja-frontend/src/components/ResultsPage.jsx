@@ -1,27 +1,31 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from "react";
 
 export default function ResultsPage() {
-  const [data, setData] = useState({ ninjas: [], unit: 'm' })
-  const [error, setError] = useState('')
+  const [data, setData] = useState({ninjas: [], unit: "m"});
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // naive attempt: if coords are in sessionStorage from previous page, use them
-    const lat = sessionStorage.getItem('lat')
-    const lng = sessionStorage.getItem('lng')
-    if (!lat || !lng) return
+    const lat = sessionStorage.getItem("lat");
+    const lng = sessionStorage.getItem("lng");
+    if (!lat || !lng) return;
 
     const run = async () => {
       try {
-        const res = await fetch(`/api/ninjas/?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`)
-        const json = await res.json()
-        if (!res.ok) throw new Error(json.error || 'Failed to fetch results')
-        setData({ ninjas: json.data?.slice(0, 5) || [], unit: json.unit || 'm' })
+        const res = await fetch(
+          `/api/ninjas/?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(
+            lng
+          )}`
+        );
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "Failed to fetch results");
+        setData({ninjas: json.data?.slice(0, 5) || [], unit: json.unit || "m"});
       } catch (e) {
-        setError(e.message || 'Failed to fetch results')
+        setError(e.message || "Failed to fetch results");
       }
-    }
-    run()
-  }, [])
+    };
+    run();
+  }, []);
 
   return (
     <div className="min-h-screen p-6 text-white">
@@ -32,7 +36,10 @@ export default function ResultsPage() {
       ) : (
         <ul className="space-y-3">
           {data.ninjas.map((n) => (
-            <li key={n._id} className="rounded-xl border border-white/20 p-4 bg-white/10">
+            <li
+              key={n._id}
+              className="rounded-xl border border-white/20 p-4 bg-white/10"
+            >
               <div className="font-semibold">{n.name}</div>
               <div className="text-sm opacity-80">{n.rank}</div>
             </li>
@@ -40,5 +47,5 @@ export default function ResultsPage() {
         </ul>
       )}
     </div>
-  )
-} 
+  );
+}

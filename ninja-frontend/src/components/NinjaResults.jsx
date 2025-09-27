@@ -1,3 +1,5 @@
+// not in use atleast not now
+
 import React, {useState} from "react";
 
 // Separate component for displaying ninja results
