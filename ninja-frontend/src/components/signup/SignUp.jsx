@@ -1,39 +1,33 @@
+// src/components/signup/SignUp.jsx
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Signup() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({name: "", email: "", password: ""});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  //
   const handleChange = (e) => {
-    setFormData({...formData, [e.target.name]: e.target.value});
+    setFormData((prev) => ({...prev, [e.target.name]: e.target.value}));
   };
-  // console.log("form data -", formData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const {name, email, password} = formData;
     if (!name || !email || !password) {
-      msg = "name, email and password are required";
+      const msg = "name, email and password are required";
       // setError(msg)  // for inline error msg dont use both the toast and setError together it will give same error in two different places
       toast.error(msg);
       return;
     }
 
     setLoading(true);
-    // setError("");
 
+    setError("");
     // makeing payload available to catch block
     let payload = {};
 
@@ -44,7 +38,7 @@ export default function Signup() {
         body: JSON.stringify(formData),
       });
 
-      // parse body once, defensively if not json
+      // Defensive parse — try JSON, fallback to text
       try {
         payload = await res.json();
       } catch {
@@ -57,13 +51,10 @@ export default function Signup() {
         }
       }
 
-      // the res.ok is the true if res.status is btw 200-299 and i in any other case it is false
-      const {message, error} = data;
-
       if (!res.ok) {
         const serverMsg =
-          payload?.error?.details?.[0]?.message || // Joi common shape
-          payload?.error?.[0]?.message || // older shape
+          payload?.error?.details?.[0]?.message || // Joi shape
+          payload?.error?.[0]?.message || // legacy shape
           payload?.message ||
           "Signup failed";
 
@@ -72,18 +63,21 @@ export default function Signup() {
         throw new Error(serverMsg);
       }
 
-      // success
+      // Success path
       if (payload.token) {
         localStorage.setItem("token", payload.token);
-        localStorage.setItem("loggedInUser", payload.name);
+        // backend returns payload.user?.name — prefer that if present
+        localStorage.setItem(
+          "loggedInUser",
+          payload.user?.name || payload.name || ""
+        );
       }
 
-      const successMsg = payload.message || "Signup successful!";
-      toast.success(successMsg);
+      toast.success(payload.message || "Signup successful!");
 
-      // redirect after tiny delay so user sees the toast
+      // give user a brief moment to see the toast
       setTimeout(() => {
-        navigate("/dashboard"); // change if you prefer /result
+        navigate("/dashboard"); // change to /result if you prefer
       }, 800);
 
       // all the error in the catch block
@@ -94,8 +88,7 @@ export default function Signup() {
         payload?.message ||
         err?.message ||
         "Signup failed. Please try again.";
-
-      // setError(msg);
+      // setError(msg); // optional inline error
       toast.error(msg);
 
       // console.log("signup error", { msg, err, payload });
@@ -131,7 +124,7 @@ export default function Signup() {
                   Sign up to start your ninja journey
                 </p>
 
-                {/* Error */}
+                {/* Inline error (optional) */}
                 {error && (
                   <div className="mb-4 rounded-2xl bg-red-500/20 border border-red-400/50 p-4 backdrop-blur-sm">
                     <p className="text-center text-sm text-red-200">{error}</p>
@@ -146,7 +139,6 @@ export default function Signup() {
                       🧑 Name
                     </label>
                     <input
-                      type="text"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
@@ -162,8 +154,8 @@ export default function Signup() {
                       📧 Email
                     </label>
                     <input
-                      type="email"
                       name="email"
+                      type="email"
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="Enter your email"
@@ -178,8 +170,8 @@ export default function Signup() {
                       🔑 Password
                     </label>
                     <input
-                      type="password"
                       name="password"
+                      type="password"
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="Enter your password"
@@ -195,7 +187,7 @@ export default function Signup() {
                     className={`w-full group relative overflow-hidden rounded-2xl px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 transform hover:scale-105 ${
                       loading
                         ? "bg-gray-600 cursor-not-allowed"
-                        : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 hover:shadow-purple-500/25"
+                        : "bg-gradient-to-r from-purple-600 to-indigo-600"
                     }`}
                   >
                     {loading ? (
@@ -247,6 +239,7 @@ export default function Signup() {
           }
         `}</style>
       </div>
+
       <ToastContainer
         position="top-right"
         autoClose={5000}
