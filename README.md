@@ -23,6 +23,45 @@ net_ninja/
   ninja-frontend/              # Vite React app
 ```
 
+## Project Tree
+
+```
+net_ninja/
+├── index.js
+├── package.json
+├── .env
+├── database/
+│   └── db.js
+├── models/
+│   ├── ninja.js
+│   └── user.js
+├── routes/
+│   ├── api.js
+│   └── AuthRouter.js
+├── controllers/
+│   ├── AuthController.js
+│   └── loginController.js
+├── MiddleWare/
+│   └── AuthValidation.js
+└── ninja-frontend/
+    ├── package.json
+    ├── vite.config.js
+    ├── index.html
+    ├── public/
+    └── src/
+        ├── main.jsx
+        ├── App.jsx
+        ├── components/
+        │   ├── login/
+        │   │   └── Login.jsx
+        │   └── signup/
+        │       └── SignUp.jsx
+        ├── hooks/
+        │   └── useMediaQuery.js
+        └── router/
+            └── Router.jsx
+```
+
 ## Prerequisites
 
 - Node.js 18+

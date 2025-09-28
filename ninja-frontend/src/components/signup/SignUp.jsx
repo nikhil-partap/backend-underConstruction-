@@ -22,14 +22,20 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+
     const {name, email, password} = formData;
     if (!name || !email || !password) {
-      setLoading(false);
-      toast.error("name, email and password are required");
+      msg = "name, email and password are required";
+      // setError(msg)  // for inline error msg dont use both the toast and setError together it will give same error in two different places
+      toast.error(msg);
       return;
     }
+
+    setLoading(true);
+    // setError("");
+
+    // makeing payload available to catch block
+    let payload = {};
 
     try {
       const res = await fetch("/auth/signup", {
@@ -38,35 +44,61 @@ export default function Signup() {
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json().catch(() => ({}));
-      console.log(data);
+      // parse body once, defensively if not json
+      try {
+        payload = await res.json();
+      } catch {
+        // not JSON — try text
+        try {
+          const text = await res.text();
+          payload = {message: text};
+        } catch {
+          payload = {};
+        }
+      }
+
       // the res.ok is the true if res.status is btw 200-299 and i in any other case it is false
       const {message, error} = data;
 
       if (!res.ok) {
-        // its a hassle to find the error msg but got it
-        const errorMsg =
-          data.error?.[0]?.message || data.message || "Signup failed";
+        const serverMsg =
+          payload?.error?.details?.[0]?.message || // Joi common shape
+          payload?.error?.[0]?.message || // older shape
+          payload?.message ||
+          "Signup failed";
 
         // toast.error(errorMsg); // ✅ Show in toast (i am already giving the error in the catch block no need to give the error here or else it will be repeated two time)
 
-        throw new Error(errorMsg); // throw error so catch block also has it if needed
+        throw new Error(serverMsg);
       }
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
+      // success
+      if (payload.token) {
+        localStorage.setItem("token", payload.token);
+        localStorage.setItem("loggedInUser", payload.name);
       }
 
-      toast.success("Signup successfull!");
+      const successMsg = payload.message || "Signup successful!";
+      toast.success(successMsg);
 
-      // change it to /dashboard just a reminder for future
+      // redirect after tiny delay so user sees the toast
       setTimeout(() => {
-        navigate("/result");
-      }, 1000);
+        navigate("/dashboard"); // change if you prefer /result
+      }, 800);
 
       // all the error in the catch block
     } catch (err) {
-      toast.error(err.message || "Something went wrong!");
+      const msg =
+        payload?.error?.details?.[0]?.message ||
+        payload?.error?.[0]?.message ||
+        payload?.message ||
+        err?.message ||
+        "Signup failed. Please try again.";
+
+      // setError(msg);
+      toast.error(msg);
+
+      // console.log("signup error", { msg, err, payload });
     } finally {
       setLoading(false);
     }

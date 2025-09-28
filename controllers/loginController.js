@@ -9,7 +9,7 @@ const loginController = async (req, res, next) => {
     const user = await User.findOne({email});
     if (!user) {
       return res.status(403).json({
-        message: "Invalid email or the account doesnot exist",
+        message: "Invalid email or account does not exist",
         success: false,
       });
     }
@@ -18,16 +18,14 @@ const loginController = async (req, res, next) => {
     if (!passwordCompare) {
       return res
         .status(401)
-        .json({message: "Invalid Passoword", success: false});
+        .json({message: "Invalid Password", success: false});
     }
 
     // sign a JWT (example). Put a secret in process.env.JWT_SECRET
     const token = jwt.sign(
       {id: user._id, email: user.email},
       process.env.JWT_SECRET || "devsecret",
-      {
-        expiresIn: "7d",
-      }
+      {expiresIn: "7d"}
     );
 
     return res.status(200).json({name: user.name, success: true, token});

@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {useMediaQuery} from "../hooks/useMediaQuery";
+// import {useMediaQuery} from "../hooks/useMediaQuery";
 import {Link, NavLink, useNavigate} from "react-router-dom";
 import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,19 +11,23 @@ export default function Login() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  // const isMobile = useMediaQuery("(max-width: 767px)");   // not in use now keeping for future use
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      setError("Please fill in all fields");
+      // setError("Please fill in all fields");
+      toast.error("Please fill in all fields");
       return;
     }
 
     setLoading(true);
     setError("");
+
+    // now the payload is accessible to the catch block
+    let payload = {};
 
     try {
       //  login API endpoint (proxied by Vite)
@@ -35,18 +39,56 @@ export default function Login() {
         body: JSON.stringify({email, password}),
       });
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.message || "Invalid credentials");
+      // parsing, but being  defensive if not JSON
+      try {
+        payload = await response.json();
+      } catch {
+        // not JSON — try text
+        try {
+          const text = await response.text();
+          payload = {message: text};
+        } catch {
+          payload = {};
+        }
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        // pick the best error message available from common Joi/legacy shapes
+        const serverMsg =
+          payload?.error?.details?.[0]?.message || // Joi common shape
+          payload?.error?.[0]?.message || // older shape i am getting
+          payload?.message || // top-level message
+          "Invalid credentials";
+
+        throw new Error(serverMsg);
+      }
 
       // Handle successful login (store token, redirect, etc.)
-      localStorage.setItem("token", data.token);
-      navigate("/dashboard");
+      const data = payload;
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("loggedInUser", data.name);
+      }
+
+      toast.success("Login Successful"); // i am using timeout because of this login success message so user can see this msg before getting routed to /dashboard
+      // route to dashboard with a timeout on successful login
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 800);
+
+      // error handleing or you can say robust error handeling in my case
     } catch (err) {
-      setError(err.message || "Login failed. Please try again.");
+      const msg =
+        payload?.error?.details?.[0]?.message ||
+        payload?.error?.[0]?.message ||
+        payload?.message ||
+        err?.message ||
+        "Login failed. Please try again.";
+
+      console.log("login error", {msg, err, payload});
+
+      // setError(msg);    // uncomment if you want the same error in two differnt places as first i was using the inline error message then  i switched to the toast error messages and i did not remove the inline error code so you can use it if you want
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -118,7 +160,7 @@ export default function Login() {
                       className="w-full rounded-2xl border-0 bg-white/20 px-4 py-3 text-white placeholder:text-purple-300 backdrop-blur-sm transition-all duration-300 focus:bg-white/30 focus:ring-2 focus:ring-purple-400 focus:ring-offset-0"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      required
+                      // required
                     />
                   </label>
                 </div>
@@ -136,7 +178,7 @@ export default function Login() {
                         className="w-full rounded-2xl border-0 bg-white/20 px-4 py-3 pr-12 text-white placeholder:text-purple-300 backdrop-blur-sm transition-all duration-300 focus:bg-white/30 focus:ring-2 focus:ring-purple-400 focus:ring-offset-0"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
+                        // required
                       />
                       <button
                         type="button"
