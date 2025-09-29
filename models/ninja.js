@@ -21,11 +21,11 @@ const NinjaSchema = new Schema(
       required: [true, "Name field is required"],
       trim: true,
     },
-    // email:{
-    //   type: String,
-    //   required: true,
-    //   unique:true,
-    // },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     // password: {
     //   type: String,
     //   required:true,

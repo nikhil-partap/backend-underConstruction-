@@ -12,7 +12,8 @@ import App from "./App.jsx";
 import Login from "./components/LoginPage/Login.jsx";
 import Signup from "./components/signup/SignUp.jsx";
 import Dashboard from "./components/Dashboard.jsx";
-import ResultsPage from "./components/ResultsPage.jsx";
+// import ResultsPage from "./components/ResultsPage.jsx";
+// import MakeProfile from "./components/MakeProfile.jsx";
 
 import {
   createBrowserRouter,
@@ -28,7 +29,8 @@ const router = createBrowserRouter(
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
       <Route path="dashboard" element={<Dashboard />} />
-      <Route path="result" element={<ResultsPage />} />
+      {/* <Route path="result" element={<ResultsPage />} /> */}
+      {/* <Route path="make_profile" element={<MakeProfile />} /> */}
     </Route>
   )
 );

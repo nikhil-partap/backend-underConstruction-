@@ -7,6 +7,7 @@ import router from "./routes/api.js";
 import connectDB from "./database/db.js";
 import Ninja from "./models/ninja.js";
 import cors from "cors";
+import AuthRouter from "./routes/AuthRouter.js";
 
 const app = express();
 
@@ -15,13 +16,12 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // mount routers
-import AuthRouter from "./routes/AuthRouter.js";
 app.use("/auth", AuthRouter);
 app.use("/api", router);
 
 const PORT = process.env.PORT || 4000;
 
-// Connect to DB and ensure indexes
+// Connect to DB and ensure indexes this to add the 2D index
 connectDB()
   .then(async () => {
     try {

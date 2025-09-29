@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import {Link, NavLink, useNavigate} from "react-router-dom";
 import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ninja from "../../../../models/ninja";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -66,15 +67,35 @@ export default function Login() {
       // Handle successful login (store token, redirect, etc.)
       const data = payload;
       if (data.token) {
+        // save the token , name, email in the local storage then i will call the ninja backend through the email and retrieve the specefic user data
         localStorage.setItem("token", data.token);
-        localStorage.setItem("loggedInUser", data.name);
+        localStorage.setItem("loggedInUser", data.name); // this the name i will use at the login screen just after the user login into the site
+        localStorage.setItem("loggedInUserMail", data.email);
       }
 
-      toast.success("Login Successful"); // i am using timeout because of this login success message so user can see this msg before getting routed to /dashboard
-      // route to dashboard with a timeout on successful login
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 800);
+      let email = "";
+      try {
+        const storedEmail = localStorage.getItem("loggedInUserMail");
+        if (storedEmail) {
+          email = storedEmail;
+        }
+      } catch (error) {
+        toast.error(error.message || "Failed to read email from storage");
+      }
+      const foundUser = await ninja.findOne({email});
+
+      if (foundUser) {
+        // this will not happen because calling after the user SignUp
+        toast.success("Login Successful"); // i am using timeout because of this login success message so user can see this msg before getting routed to /dashboard
+        // route to dashboard with a timeout on successful login
+        setTimeout(() => {
+          // if
+          navigate("/dashboard");
+        }, 800);
+      } else{
+        toast.success("Login Successful"); // i am using timeout because of this login success message so user can see this msg before getting routed to /make_profile 
+        navigate('/make_profile')
+      }
 
       // error handleing or you can say robust error handeling in my case
     } catch (err) {

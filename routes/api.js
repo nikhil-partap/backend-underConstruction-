@@ -13,6 +13,7 @@ router.get("/ninjas", async (req, res, next) => {
       return res.status(400).json({error: "please provide lng and lat "});
     }
 
+    // the lng and lat you recieve are in string form so we have  to convert them to int
     const parsedLng = parseFloat(lng);
     const parsedLat = parseFloat(lat);
     const parsedMax = parseInt(maxDistance, 10);
@@ -28,11 +29,11 @@ router.get("/ninjas", async (req, res, next) => {
         $geoNear: {
           near: {
             type: "Point",
-            coordinates: [parsedLng, parsedLat], // the lng and lat you recieve are in string form so we have  to convert them to int
+            coordinates: [parsedLng, parsedLat],
           },
-          distanceField: "distance", // 100 km radius
+          distanceField: "distance",
           spherical: true,
-          maxDistance: parsedMax,
+          maxDistance: parsedMax, // 1000000 km radius
           distanceMultiplier,
         },
       },
@@ -113,8 +114,50 @@ router.delete("/ninjas/:id", auth, async (req, res, next) => {
   }
 });
 
+// this sends the data to the dashboard
+router.get("/data/:email", async (req, res, next) => {
+  try {
+    // geting the mail from the user side
+    const {email} = req.params; // through the params
 
-// only use if you want to delete all the data of the database 
+    if (!email) {
+      // error handleing for email
+      return res
+        .status(400)
+        .json({success: false, message: "Email is required"});
+    }
+
+    // Find user by email
+    const foundUser = await Ninja.findOne({email});
+
+    if (!foundUser) {
+      // this will not happen because calling after the user SignUp
+      return res.status(404).json({success: false, message: "User not found"});
+    }
+
+    // sending the userfound to the frontend
+    res.status(200).json({
+      success: true,
+      data: foundUser,
+    });
+  } catch (err) {
+    // middleware for unexpected errors
+    next(err);
+  }
+});
+
+//  to get the ninja from the data base
+router.get("/user/:email", async (req, res) => {
+  try {
+    const foundUser = await Ninja.findOne({email: req.params.email});
+    if (!foundUser) return res.status(404).json({message: "User not found"});
+    res.json(foundUser);
+  } catch (err) {
+    res.status(500).json({message: err.message});
+  }
+});
+
+// only use if you want to delete all the data of the database
 // router.delete("/ninjas", async (req, res, next) => {
 //   try {
 //     // if (req.query.confirm !== "true") {
@@ -135,6 +178,5 @@ router.delete("/ninjas/:id", auth, async (req, res, next) => {
 //     next(err);
 //   }
 // });
-
 
 export default router;
